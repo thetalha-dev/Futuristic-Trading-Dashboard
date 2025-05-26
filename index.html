@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinUI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="desktop">
+        <div class="desktop-icon" onclick="openWindow('explorer')">
+            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
+            <span>File Explorer</span>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('notepad')">
+            <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
+            <span>Notepad</span>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('calculator')">
+            <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
+            <span>Calculator</span>
+        </div>
+        <div class="desktop-icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/888/888882.png" alt="Chrome">
+            <span>Google Chrome</span>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-button" id="startButton" onclick="toggleStartMenu()">
+            <i class="fab fa-windows"></i>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" onclick="openWindow('explorer')">
+                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
+            </div>
+            <div class="taskbar-icon" onclick="openWindow('notepad')">
+                <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
+            </div>
+            <div class="taskbar-icon" onclick="openWindow('calculator')">
+                <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
+            </div>
+        </div>
+        <div class="clock" id="clock">12:00 PM</div>
+    </div>
+
+    <div class="start-menu" id="startMenu">
+        <div class="start-menu-header">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Type here to search">
+        </div>
+        <div class="start-menu-content">
+            <div class="pinned-apps">
+                <h3>Pinned</h3>
+                <div class="app-grid">
+                    <div class="app" onclick="openWindow('explorer')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
+                        <span>File Explorer</span>
+                    </div>
+                    <div class="app" onclick="openWindow('notepad')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
+                        <span>Notepad</span>
+                    </div>
+                    <div class="app" onclick="openWindow('calculator')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
+                        <span>Calculator</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/888/888882.png" alt="Chrome">
+                        <span>Google Chrome</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965278.png" alt="Settings">
+                        <span>Settings</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965256.png" alt="Store">
+                        <span>Microsoft Store</span>
+                    </div>
+                </div>
+            </div>
+            <div class="recommended">
+                <h3>Recommended</h3>
+                <div class="app-grid">
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965283.png" alt="Word">
+                        <span>Word</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" alt="Excel">
+                        <span>Excel</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965291.png" alt="PowerPoint">
+                        <span>PowerPoint</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2913/2913111.png" alt="Visual Studio">
+                        <span>Visual Studio</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968666.png" alt="Edge">
+                        <span>Edge</span>
+                    </div>
+                    <div class="app">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="Outlook">
+                        <span>Outlook</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile" onclick="openWindow('user-settings')">
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User">
+            <span>User</span>
+        </div>
+    </div>
+
+    <div class="window" id="explorerWindow">
+        <div class="window-header">
+            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="Explorer">
+            <div class="window-title">File Explorer</div>
+            <div class="window-controls">
+                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
+                <button class="window-btn maximize"><i class="far fa-square"></i></button>
+                <button class="window-btn close" onclick="closeWindow('explorerWindow')"><i
+                        class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="explorer-nav">
+            <button class="explorer-nav-btn"><i class="fas fa-arrow-left"></i></button>
+            <button class="explorer-nav-btn"><i class="fas fa-arrow-right"></i></button>
+            <button class="explorer-nav-btn"><i class="fas fa-arrow-up"></i></button>
+            <input type="text" class="explorer-path" value="This PC > Documents">
+        </div>
+        <div class="explorer-body">
+            <div class="explorer-sidebar">
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965318.png"
+                        alt="Desktop">
+                    <span>Desktop</span>
+                </div>
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965316.png"
+                        alt="Documents">
+                    <span>Documents</span>
+                </div>
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965311.png"
+                        alt="Downloads">
+                    <span>Downloads</span>
+                </div>
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965334.png" alt="Music">
+                    <span>Music</span>
+                </div>
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965351.png"
+                        alt="Pictures">
+                    <span>Pictures</span>
+                </div>
+                <div class="folder">
+                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965341.png" alt="Videos">
+                    <span>Videos</span>
+                </div>
+            </div>
+            <div class="explorer-files">
+                Some files would be listed here...
+            </div>
+        </div>
+        <div class="window-footer">
+            <div>5 items</div>
+            <div>100 GB free of 256 GB</div>
+        </div>
+    </div>
+
+    <div class="window" id="notepadWindow">
+        <div class="window-header">
+            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
+            <div class="window-title">Untitled - Notepad</div>
+            <div class="window-controls">
+                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
+                <button class="window-btn maximize"><i class="far fa-square"></i></button>
+                <button class="window-btn close" onclick="closeWindow('notepadWindow')"><i
+                        class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="window-content">
+            <textarea class="notepad-textarea">This is a sample text in Notepad.
+
+You can type here whatever you want.
+
+• List item 1
+• List item 2
+• List item 3
+
+1234567890
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz</textarea>
+        </div>
+        <div class="window-footer">
+            <div>Ln 7, Col 1</div>
+            <div>Windows (CRLF)</div>
+            <div>UTF-8</div>
+        </div>
+    </div>
+
+    <div class="window" id="calculatorWindow">
+        <div class="window-header">
+            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
+            <div class="window-title">Calculator</div>
+            <div class="window-controls">
+                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
+                <button class="window-btn maximize"><i class="far fa-square"></i></button>
+                <button class="window-btn close" onclick="closeWindow('calculatorWindow')"><i
+                        class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="window-content">
+            <p>Calculator functionality would go here...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+
+<!-- // Follow Me Guys😀 TK: @talha_coder_5577 IG: talhaaa.khann -->
