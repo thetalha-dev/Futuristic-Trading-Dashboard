@@ -4,229 +4,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinUI</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NEON TRADER 2077</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
-<body>
-    <div class="desktop">
-        <div class="desktop-icon" onclick="openWindow('explorer')">
-            <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
-            <span>File Explorer</span>
+<body class="min-h-screen grid-bg">
+    <div class="scanline"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Cyber Noise Overlay -->
+    <div class="fixed inset-0 pointer-events-none opacity-5" id="noiseOverlay"
+        style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\" 0 0 200 200\"
+        xmlns=\"http://www.w3.org/2000/svg\">
+        <filter id=\"noise\">
+            <feTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"3\" stitchTiles=\"stitch\" />
+        </filter>
+        <rect width=\"100%\" height=\"100%\" filter=\"url(%23noise)\" /></svg>');">
+    </div>
+
+    <!-- Header with glitch effect -->
+    <header
+        class="bg-black bg-opacity-80 border-b border-neon-blue py-4 px-6 flex justify-between items-center neon-border-blue relative">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-neon-pink rounded-full glow-pink flex items-center justify-center">
+                <i class="fas fa-chart-line text-xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold neon-text-pink flicker cyber-glitch" data-text="NEON TRADER 2077">NEON TRADER
+                2077</h1>
         </div>
-        <div class="desktop-icon" onclick="openWindow('notepad')">
-            <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
-            <span>Notepad</span>
+
+        <div class="flex items-center space-x-6">
+            <div class="text-center">
+                <p class="text-xs text-gray-400">CRYPTO TIME</p>
+                <p id="current-time" class="text-xl neon-text-blue font-orbitron">23:59:45</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400">NET WORTH</p>
+                <p class="text-xl neon-text-pink font-orbitron">₡ <span id="net-worth">1,245,890</span></p>
+            </div>
+            <div class="cyber-dropdown">
+                <div class="w-10 h-10 rounded-full bg-neon-blue bg-opacity-30 flex items-center justify-center neon-border-blue cursor-pointer hover:bg-opacity-50 transition cyber-tooltip"
+                    data-tooltip="User Profile">
+                    <i class="fas fa-user neon-text-blue"></i>
+                </div>
+                <div class="cyber-dropdown-content">
+                    <div class="p-3 border-b border-gray-800">
+                        <p class="text-sm neon-text-blue">Logged in as: <span class="text-white">Corp_Trader_42</span>
+                        </p>
+                    </div>
+                    <div class="p-2">
+                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">Dashboard</a>
+                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">Settings</a>
+                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">Logout</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="desktop-icon" onclick="openWindow('calculator')">
-            <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
-            <span>Calculator</span>
+
+        <!-- Connection status indicator -->
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-blue via-neon-pink to-neon-green"
+            id="connectionIndicator"></div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Portfolio Summary with holographic effect -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-pink holographic">
+                    <div class="relative">
+                        <h2 class="text-xl neon-text-pink font-orbitron mb-4 flex items-center">
+                            <span>PORTFOLIO</span>
+                            <span class="cyber-badge new ml-2">NEW</span>
+                        </h2>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Total Value:</span>
+                                <span class="neon-text-blue font-bold">₡ <span
+                                        id="portfolio-total">1,245,890</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Day Change:</span>
+                                <span class="text-green-400 font-bold">+₡ <span id="day-change">24,560</span> (<span
+                                        id="day-change-percent">+2.01%</span>)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Buying Power:</span>
+                                <span class="neon-text-blue font-bold">₡ <span id="buying-power">245,890</span></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h3 class="text-sm text-gray-400 mb-2">ASSET DISTRIBUTION</h3>
+                            <div class="cyber-progress mb-2">
+                                <div class="cyber-progress-bar" id="asset-progress"></div>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="neon-text-pink">Stocks (65%)</span>
+                                <span class="neon-text-blue">Crypto (35%)</span>
+                            </div>
+                        </div>
+
+                        <!-- Mini chart animation -->
+                        <div class="mt-4 h-16 relative">
+                            <canvas id="miniChart" class="w-full h-full"></canvas>
+                            <div
+                                class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-pink via-neon-blue to-neon-green">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions with enhanced buttons -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-blue">
+                    <h2 class="text-xl neon-text-blue font-orbitron mb-4">QUICK ACTIONS</h2>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button
+                            class="cyber-button bg-neon-pink bg-opacity-20 text-white py-2 px-3 rounded-md neon-border-pink neon-text-pink hover:bg-opacity-30 cyber-tooltip"
+                            data-tooltip="Buy Assets">
+                            <i class="fas fa-arrow-up mr-2"></i> Buy
+                        </button>
+                        <button
+                            class="cyber-button bg-red-500 bg-opacity-20 text-white py-2 px-3 rounded-md border border-red-500 text-red-400 hover:bg-opacity-30 cyber-tooltip"
+                            data-tooltip="Sell Assets">
+                            <i class="fas fa-arrow-down mr-2"></i> Sell
+                        </button>
+                        <button
+                            class="cyber-button bg-neon-blue bg-opacity-20 text-white py-2 px-3 rounded-md neon-border-blue neon-text-blue hover:bg-opacity-30 cyber-tooltip"
+                            data-tooltip="Trade Pairs">
+                            <i class="fas fa-exchange-alt mr-2"></i> Trade
+                        </button>
+                        <button
+                            class="cyber-button bg-purple-500 bg-opacity-20 text-white py-2 px-3 rounded-md border border-purple-500 text-purple-400 hover:bg-opacity-30 cyber-tooltip"
+                            data-tooltip="Crypto Markets">
+                            <i class="fas fa-coins mr-2"></i> Crypto
+                        </button>
+                    </div>
+
+                    <!-- Quick transfer form -->
+                    <div class="mt-4">
+                        <h3 class="text-sm neon-text-green mb-2">QUICK TRANSFER</h3>
+                        <div class="flex space-x-2">
+                            <input type="text" class="cyber-input flex-1 text-sm py-1 px-2 rounded"
+                                placeholder="Amount ₡">
+                            <button
+                                class="cyber-button bg-neon-green bg-opacity-20 text-neon-green text-sm py-1 px-3 rounded border border-neon-green cyber-tooltip"
+                                data-tooltip="Transfer Funds">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Feed with carousel -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-pink">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl neon-text-pink font-orbitron">CYBER NEWS</h2>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-400 mr-2">AUTO</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" id="newsAutoScroll" checked>
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-neon-pink">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="cyber-carousel" id="newsCarousel">
+                        <div class="cyber-carousel-slide active">
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">10:45 AM</p>
+                                <p class="text-sm neon-text-blue">Arasaka Corp announces breakthrough in neural
+                                    interface tech</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">09:30 AM</p>
+                                <p class="text-sm neon-text-blue">Militech wins major defense contract</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">08:15 AM</p>
+                                <p class="text-sm neon-text-blue">NetWatch reports surge in rogue AIs</p>
+                            </div>
+                        </div>
+
+                        <div class="cyber-carousel-slide">
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">07:00 AM</p>
+                                <p class="text-sm neon-text-blue">Night City stock exchange hits record high</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">06:30 AM</p>
+                                <p class="text-sm neon-text-blue">New cyberware regulations announced</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">05:45 AM</p>
+                                <p class="text-sm neon-text-blue">Crypto market volatility expected</p>
+                            </div>
+                        </div>
+
+                        <div class="cyber-carousel-slide">
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">04:30 AM</p>
+                                <p class="text-sm neon-text-blue">Biotechnica patents new synthetic food</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">03:15 AM</p>
+                                <p class="text-sm neon-text-blue">Trauma Team IPO oversubscribed</p>
+                            </div>
+                            <div class="border-b border-gray-800 pb-3">
+                                <p class="text-xs text-gray-400">02:00 AM</p>
+                                <p class="text-sm neon-text-blue">Zetatech unveils new cyberdeck</p>
+                            </div>
+                        </div>
+
+                        <div class="cyber-carousel-nav">
+                            <div class="cyber-carousel-dot active" data-slide="0"></div>
+                            <div class="cyber-carousel-dot" data-slide="1"></div>
+                            <div class="cyber-carousel-dot" data-slide="2"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <button id="refreshNews" class="text-xs text-gray-400 hover:text-neon-blue">
+                            <i class="fas fa-sync-alt mr-1"></i> Refresh Feed
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Countdown to market close -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-blue text-center">
+                    <h3 class="text-sm text-gray-400 mb-1">MARKET CLOSES IN</h3>
+                    <div class="cyber-countdown flex justify-center items-center">
+                        <span id="countdown-hours">05</span>
+                        <span class="cyber-countdown separator">:</span>
+                        <span id="countdown-minutes">43</span>
+                        <span class="cyber-countdown separator">:</span>
+                        <span id="countdown-seconds">22</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-3 space-y-6">
+                <!-- Market Overview with tabs -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-blue">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl neon-text-blue font-orbitron">MARKET OVERVIEW</h2>
+                        <div class="cyber-tabs">
+                            <div class="cyber-tab active" data-tab="stocks">STOCKS</div>
+                            <div class="cyber-tab" data-tab="crypto">CRYPTO</div>
+                            <div class="cyber-tab" data-tab="futures">FUTURES</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="market-metrics">
+                        <div
+                            class="bg-gray-900 bg-opacity-50 p-3 rounded-lg border border-gray-800 hover:border-neon-blue transition">
+                            <p class="text-xs text-gray-400">NIGHT CITY INDEX</p>
+                            <p class="text-xl neon-text-blue font-orbitron">4,328.76</p>
+                            <p class="text-sm text-green-400">+42.18 (0.98%)</p>
+                        </div>
+                        <div
+                            class="bg-gray-900 bg-opacity-50 p-3 rounded-lg border border-gray-800 hover:border-neon-pink transition">
+                            <p class="text-xs text-gray-400">TECH SECTOR</p>
+                            <p class="text-xl neon-text-pink font-orbitron">1,845.32</p>
+                            <p class="text-sm text-green-400">+28.45 (1.56%)</p>
+                        </div>
+                        <div
+                            class="bg-gray-900 bg-opacity-50 p-3 rounded-lg border border-gray-800 hover:border-neon-blue transition">
+                            <p class="text-xs text-gray-400">BTC/USD</p>
+                            <p class="text-xl neon-text-blue font-orbitron">₡ 42,876</p>
+                            <p class="text-sm text-red-400">-1,245.76 (2.82%)</p>
+                        </div>
+                        <div
+                            class="bg-gray-900 bg-opacity-50 p-3 rounded-lg border border-gray-800 hover:border-neon-pink transition">
+                            <p class="text-xs text-gray-400">ETH/USD</p>
+                            <p class="text-xl neon-text-pink font-orbitron">₡ 2,876</p>
+                            <p class="text-sm text-green-400">+45.32 (1.60%)</p>
+                        </div>
+                    </div>
+
+                    <!-- Stock Chart with interactive controls -->
+                    <div class="h-64 bg-gray-900 bg-opacity-50 rounded-lg mb-4 relative overflow-hidden"
+                        id="mainChartContainer">
+                        <div class="absolute top-2 left-2 z-10 flex space-x-1">
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Line Chart">
+                                <i class="fas fa-chart-line"></i>
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Candlestick">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Area Chart">
+                                <i class="fas fa-chart-area"></i>
+                            </button>
+                        </div>
+
+                        <canvas id="mainChart" class="w-full h-full"></canvas>
+
+                        <div
+                            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-pink via-neon-blue to-neon-green">
+                        </div>
+
+                        <div class="absolute bottom-2 right-2 z-10 flex space-x-1">
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Draw Tools">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Indicators">
+                                <i class="fas fa-wave-square"></i>
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-2 rounded cyber-tooltip"
+                                data-tooltip="Fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-2">
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">1D</button>
+                            <button
+                                class="cyber-button bg-neon-blue bg-opacity-20 text-white text-xs py-1 px-3 rounded-md neon-border-blue">1W</button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">1M</button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">1Y</button>
+                            <button
+                                class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">ALL</button>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <span class="neon-text-blue cursor-pointer hover:underline">ARAS</span> |
+                            <span class="neon-text-pink cursor-pointer hover:underline">MILT</span> |
+                            <span class="neon-text-blue cursor-pointer hover:underline">KANG</span> |
+                            <span class="neon-text-pink cursor-pointer hover:underline">NETW</span> |
+                            <span class="neon-text-green cursor-pointer hover:underline">+5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watchlist with enhanced features -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-pink">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-4">
+                            <h2 class="text-xl neon-text-pink font-orbitron">WATCHLIST</h2>
+                            <div class="cyber-dropdown">
+                                <button
+                                    class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded flex items-center">
+                                    <span>MY LIST</span>
+                                    <i class="fas fa-caret-down ml-1"></i>
+                                </button>
+                                <div class="cyber-dropdown-content">
+                                    <div class="p-2">
+                                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">MY LIST</a>
+                                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">TOP GAINERS</a>
+                                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">TOP LOSERS</a>
+                                        <a href="#" class="block px-3 py-2 text-sm hover:bg-gray-800">MOST ACTIVE</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative flex items-center">
+                            <input type="text" placeholder="Search assets..."
+                                class="cyber-input bg-gray-900 bg-opacity-50 text-white text-sm py-1 px-3 pr-8 rounded-md border border-gray-800 focus:outline-none">
+                            <i class="fas fa-search absolute right-3 text-gray-500"></i>
+                            <button
+                                class="cyber-button bg-neon-pink bg-opacity-20 text-neon-pink text-sm py-1 px-2 rounded-md ml-2 neon-border-pink cyber-tooltip"
+                                data-tooltip="Add Asset">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-sm text-gray-400 border-b border-gray-800">
+                                    <th class="pb-2">SYMBOL</th>
+                                    <th class="pb-2">PRICE</th>
+                                    <th class="pb-2">CHANGE</th>
+                                    <th class="pb-2">% CHANGE</th>
+                                    <th class="pb-2">VOLUME</th>
+                                    <th class="pb-2">CHART</th>
+                                    <th class="pb-2">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-table">
+                                <!-- Stock data will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="text-xs text-gray-400">
+                            Showing <span class="text-white">1-9</span> of <span class="text-white">24</span> assets
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button
+                                class="cyber-button bg-neon-blue bg-opacity-20 text-white text-xs py-1 px-3 rounded-md neon-border-blue">
+                                1
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">
+                                2
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">
+                                3
+                            </button>
+                            <button class="cyber-button bg-gray-800 text-white text-xs py-1 px-3 rounded-md">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="bg-black bg-opacity-70 p-4 rounded-lg neon-border-blue">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl neon-text-blue font-orbitron">RECENT TRANSACTIONS</h2>
+                        <button
+                            class="cyber-button bg-neon-blue bg-opacity-20 text-white text-xs py-1 px-3 rounded-md neon-border-blue cyber-tooltip"
+                            data-tooltip="View All Transactions">
+                            VIEW ALL
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-900 rounded">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-neon-pink bg-opacity-20 flex items-center justify-center neon-border-pink mr-3">
+                                    <i class="fas fa-arrow-up text-xs text-neon-pink"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">BUY ARAS</p>
+                                    <p class="text-xs text-gray-400">Today, 10:23 AM</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">10 shares @ ₡245.67</p>
+                                <p class="text-xs text-green-400">Completed</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-900 rounded">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center border border-red-500 mr-3">
+                                    <i class="fas fa-arrow-down text-xs text-red-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">SELL MILT</p>
+                                    <p class="text-xs text-gray-400">Today, 09:45 AM</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">5 shares @ ₡187.32</p>
+                                <p class="text-xs text-green-400">Completed</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center p-2 hover:bg-gray-900 rounded">
+                            <div class="flex items-center">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-neon-blue bg-opacity-20 flex items-center justify-center neon-border-blue mr-3">
+                                    <i class="fas fa-exchange-alt text-xs text-neon-blue"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">TRADE BTC/ETH</p>
+                                    <p class="text-xs text-gray-400">Today, 08:30 AM</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm">0.5 BTC @ ₡42,876</p>
+                                <p class="text-xs text-yellow-400">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="desktop-icon">
-            <img src="https://cdn-icons-png.flaticon.com/512/888/888882.png" alt="Chrome">
-            <span>Google Chrome</span>
+    </main>
+
+    <!-- Footer with connection status -->
+    <footer class="bg-black bg-opacity-80 border-t border-neon-blue py-3 px-6 neon-border-blue mt-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 rounded-full bg-green-500 pulse" id="connectionStatus"></div>
+                    <span class="text-xs text-gray-400">CONNECTED</span>
+                </div>
+                <span class="text-xs text-gray-400">LATENCY: <span class="neon-text-blue"
+                        id="latencyIndicator">28ms</span></span>
+                <span class="text-xs text-gray-400">API: <span class="neon-text-pink">v3.2.7</span></span>
+                <span class="text-xs text-gray-400">DATA CENTER: <span class="neon-text-green">NC-42</span></span>
+            </div>
+            <div class="text-xs text-gray-400">
+                <span class="neon-text-blue">NEON TRADER 2077</span> | SECURE TRADING TERMINAL | <span
+                    class="neon-text-pink">ENCRYPTED</span> | <span class="neon-text-green">HIGH FREQUENCY</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cyber Modal -->
+    <div class="cyber-modal" id="assetModal">
+        <div class="cyber-modal-content">
+            <span class="cyber-close" id="closeModal">&times;</span>
+            <h2 class="text-xl neon-text-blue font-orbitron mb-4">ASSET DETAILS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg neon-text-pink font-orbitron mb-2" id="modalAssetName">Arasaka Corp (ARAS)</h3>
+                    <div class="flex items-center mb-4">
+                        <div class="text-3xl font-bold mr-4" id="modalAssetPrice">₡ 245.67</div>
+                        <div class="text-sm stock-up" id="modalAssetChange">+3.45 (1.42%)</div>
+                    </div>
+                    <div class="h-48 bg-gray-900 rounded mb-4" id="modalChartContainer">
+                        <canvas id="modalChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-4">
+                        <h4 class="text-sm text-gray-400 mb-2">MARKET DATA</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>Open: <span class="neon-text-blue">₡ 242.22</span></div>
+                            <div>High: <span class="neon-text-green">₡ 246.78</span></div>
+                            <div>Low: <span class="neon-text-pink">₡ 241.05</span></div>
+                            <div>Volume: <span>4.5M</span></div>
+                            <div>Market Cap: <span>₡ 245.6B</span></div>
+                            <div>P/E: <span>28.76</span></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="text-sm text-gray-400 mb-2">TRADE</h4>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <button
+                                class="cyber-button bg-green-900 bg-opacity-20 text-green-400 py-1 px-3 rounded border border-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i> Buy
+                            </button>
+                            <button
+                                class="cyber-button bg-red-900 bg-opacity-20 text-red-400 py-1 px-3 rounded border border-red-500">
+                                <i class="fas fa-arrow-down mr-1"></i> Sell
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <input type="text" class="cyber-input flex-1 text-sm py-1 px-2 rounded"
+                                placeholder="Shares">
+                            <select class="cyber-input text-sm py-1 px-2 rounded bg-gray-900">
+                                <option>Market</option>
+                                <option>Limit</option>
+                                <option>Stop</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-full cyber-button bg-neon-blue bg-opacity-20 text-white py-2 rounded-md neon-border-blue">
+                        PLACE ORDER
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="taskbar">
-        <div class="start-button" id="startButton" onclick="toggleStartMenu()">
-            <i class="fab fa-windows"></i>
-        </div>
-        <div class="taskbar-icons">
-            <div class="taskbar-icon" onclick="openWindow('explorer')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
+    <!-- Cyber Notification -->
+    <div class="cyber-notification" id="notification">
+        <div class="flex items-start">
+            <div class="w-6 h-6 rounded-full bg-neon-blue flex items-center justify-center mr-3 mt-1">
+                <i class="fas fa-bell text-xs text-black"></i>
             </div>
-            <div class="taskbar-icon" onclick="openWindow('notepad')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
+            <div>
+                <h3 class="text-sm font-bold neon-text-blue mb-1" id="notificationTitle">Market Update</h3>
+                <p class="text-xs" id="notificationMessage">Arasaka Corp stock has increased by 1.42%</p>
             </div>
-            <div class="taskbar-icon" onclick="openWindow('calculator')">
-                <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
-            </div>
-        </div>
-        <div class="clock" id="clock">12:00 PM</div>
-    </div>
-
-    <div class="start-menu" id="startMenu">
-        <div class="start-menu-header">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Type here to search">
-        </div>
-        <div class="start-menu-content">
-            <div class="pinned-apps">
-                <h3>Pinned</h3>
-                <div class="app-grid">
-                    <div class="app" onclick="openWindow('explorer')">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="File Explorer">
-                        <span>File Explorer</span>
-                    </div>
-                    <div class="app" onclick="openWindow('notepad')">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
-                        <span>Notepad</span>
-                    </div>
-                    <div class="app" onclick="openWindow('calculator')">
-                        <img src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
-                        <span>Calculator</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/888/888882.png" alt="Chrome">
-                        <span>Google Chrome</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965278.png" alt="Settings">
-                        <span>Settings</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965256.png" alt="Store">
-                        <span>Microsoft Store</span>
-                    </div>
-                </div>
-            </div>
-            <div class="recommended">
-                <h3>Recommended</h3>
-                <div class="app-grid">
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965283.png" alt="Word">
-                        <span>Word</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965335.png" alt="Excel">
-                        <span>Excel</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965291.png" alt="PowerPoint">
-                        <span>PowerPoint</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2913/2913111.png" alt="Visual Studio">
-                        <span>Visual Studio</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968666.png" alt="Edge">
-                        <span>Edge</span>
-                    </div>
-                    <div class="app">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046125.png" alt="Outlook">
-                        <span>Outlook</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="user-profile" onclick="openWindow('user-settings')">
-            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User">
-            <span>User</span>
         </div>
     </div>
 
-    <div class="window" id="explorerWindow">
-        <div class="window-header">
-            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="Explorer">
-            <div class="window-title">File Explorer</div>
-            <div class="window-controls">
-                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
-                <button class="window-btn maximize"><i class="far fa-square"></i></button>
-                <button class="window-btn close" onclick="closeWindow('explorerWindow')"><i
-                        class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div class="explorer-nav">
-            <button class="explorer-nav-btn"><i class="fas fa-arrow-left"></i></button>
-            <button class="explorer-nav-btn"><i class="fas fa-arrow-right"></i></button>
-            <button class="explorer-nav-btn"><i class="fas fa-arrow-up"></i></button>
-            <input type="text" class="explorer-path" value="This PC > Documents">
-        </div>
-        <div class="explorer-body">
-            <div class="explorer-sidebar">
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965318.png"
-                        alt="Desktop">
-                    <span>Desktop</span>
-                </div>
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965316.png"
-                        alt="Documents">
-                    <span>Documents</span>
-                </div>
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965311.png"
-                        alt="Downloads">
-                    <span>Downloads</span>
-                </div>
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965334.png" alt="Music">
-                    <span>Music</span>
-                </div>
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965351.png"
-                        alt="Pictures">
-                    <span>Pictures</span>
-                </div>
-                <div class="folder">
-                    <img class="folder-icon" src="https://cdn-icons-png.flaticon.com/512/2965/2965341.png" alt="Videos">
-                    <span>Videos</span>
-                </div>
-            </div>
-            <div class="explorer-files">
-                Some files would be listed here...
-            </div>
-        </div>
-        <div class="window-footer">
-            <div>5 items</div>
-            <div>100 GB free of 256 GB</div>
-        </div>
-    </div>
-
-    <div class="window" id="notepadWindow">
-        <div class="window-header">
-            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/2809/2809932.png" alt="Notepad">
-            <div class="window-title">Untitled - Notepad</div>
-            <div class="window-controls">
-                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
-                <button class="window-btn maximize"><i class="far fa-square"></i></button>
-                <button class="window-btn close" onclick="closeWindow('notepadWindow')"><i
-                        class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div class="window-content">
-            <textarea class="notepad-textarea">This is a sample text in Notepad.
-
-You can type here whatever you want.
-
-• List item 1
-• List item 2
-• List item 3
-
-1234567890
-ABCDEFGHIJKLMNOPQRSTUVWXYZ
-abcdefghijklmnopqrstuvwxyz</textarea>
-        </div>
-        <div class="window-footer">
-            <div>Ln 7, Col 1</div>
-            <div>Windows (CRLF)</div>
-            <div>UTF-8</div>
-        </div>
-    </div>
-
-    <div class="window" id="calculatorWindow">
-        <div class="window-header">
-            <img class="window-icon" src="https://cdn-icons-png.flaticon.com/512/210/210826.png" alt="Calculator">
-            <div class="window-title">Calculator</div>
-            <div class="window-controls">
-                <button class="window-btn minimize"><i class="fas fa-minus"></i></button>
-                <button class="window-btn maximize"><i class="far fa-square"></i></button>
-                <button class="window-btn close" onclick="closeWindow('calculatorWindow')"><i
-                        class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div class="window-content">
-            <p>Calculator functionality would go here...</p>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
+
 </body>
 
 </html>
-
-
-<!-- // Follow Me Guys😀 TK: @talha_coder_5577 IG: talhaaa.khann -->
